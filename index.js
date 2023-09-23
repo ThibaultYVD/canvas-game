@@ -133,22 +133,48 @@ function spawnEnemies() {
     }, 1000)
 }
 
+let animationId
+
 // Fonction pour animer l'application
 function animate() {
     // Demander au navigateur d'exécuter cette fonction en boucle
-    requestAnimationFrame(animate);
-    // Effacer le contenu du canvas pour chaque frame
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    // Dessiner le joueur
-    player.draw();
+    animationId = requestAnimationFrame(animate);
+    context.clearRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
+    player.draw(); // Dessiner le joueur
     // Mettre à jour la position de chaque projectile
     projectiles.forEach(projectile => {
         projectile.update()
     })
 
-    enemies.forEach(enemy => {
+    // Mettre à jour la position de chaque ennemi et gérer les collisions avec les projectiles
+    enemies.forEach((enemy, enemyIndex) => {
         enemy.update()
+        const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
+
+        // Vérifier s'il y a une collision entre le projectile et l'ennemi
+        if (dist - enemy.radius - player.radius < 1) {
+            // Arrêter l'animation si une collision avec le joueur est détectée
+            cancelAnimationFrame(animationId)
+
+        }
+        projectiles.forEach((projectile, projectileIndex) => {
+            // Calculer la distance entre le projectile et l'ennemi
+            const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
+
+            // Vérifier s'il y a une collision entre le projectile et l'ennemi
+            if (dist - enemy.radius - projectile.radius < 1) {
+                // Supprimer l'ennemi et le projectile en utilisant setTimeout pour éviter des problèmes de suppression pendant la boucle
+                setTimeout(() => {
+                    // On supprime l'ennemie et le projectile du tableau en utilisant l'index
+                    enemies.splice(enemyIndex, 1) 
+                    projectiles.splice(projectileIndex, 1)
+                }, 0)
+
+            }
+        })
     })
+
+
 }
 
 
