@@ -1,4 +1,4 @@
-const canvas = document.querySelector('canvas');
+const canvas = document.querySelector('canvas')
 
 // Obtenir un contexte de dessin 2D à partir de l'élément HTML canvas
 const context = canvas.getContext('2d')
@@ -10,24 +10,103 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 class Player {
+    // Constructeur pour initialiser un joueur
     constructor(x, y, radius, color) {
-        this.x = x
-        this.y = y
-        this.radius = radius
-        this.color = color
+        // Position x et y du joueur
+        this.x = x;
+        this.y = y;
+        this.radius = radius; // Rayon du joueur
+        this.color = color; // Couleur du joueur
     }
 
-    drawPlayer() {
+    // Méthode pour dessiner le joueur
+    draw() {
+        // Début d'un nouveau chemin
         context.beginPath()
+        // Dessiner un cercle pour représenter le joueur
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+        // Remplir le cercle avec la couleur spécifiée
         context.fillStyle = this.color
         context.fill()
     }
 }
 
-const x = canvas.width / 2
-const y = canvas.height / 2
-const player = new Player(x, y, 30, 'blue')
+class Projectile {
+    // Constructeur pour initialiser un projectile
+    constructor(x, y, radius, color, velocity) {
+        this.x = x; // Position x du projectile
+        this.y = y; // Position y du projectile
+        this.radius = radius; // Rayon du projectile
+        this.color = color; // Couleur du projectile
+        this.velocity = velocity; // Vitesse du projectile (un vecteur avec les composantes x et y)
+    }
 
-player.drawPlayer();
-console.log(player)
+    // Méthode pour dessiner le projectile
+    draw() {
+        // Début d'un nouveau chemin
+        context.beginPath();
+        // Dessiner un cercle pour représenter le projectile
+        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        // Remplir le cercle avec la couleur spécifiée
+        context.fillStyle = this.color;
+        context.fill();
+    }
+
+    // Méthode pour mettre à jour la position du projectile
+    update() {
+        this.draw()
+        // Mettre à jour la position du projectile en fonction de sa vitesse
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+
+    }
+}
+
+// Calculer la position x et y du joueur au milieu du canvas
+const playerX = canvas.width / 2;
+const playerY = canvas.height / 2;
+// Création d'un objet Player puis on le dessine sur le site
+const player = new Player(playerX, playerY, 30, 'blue');
+
+
+const projectiles = []
+
+// Fonction pour animer le projectile
+function animate() {
+    requestAnimationFrame(animate); // Demander au navigateur d'exécuter cette fonction en boucle
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    player.draw();
+    projectiles.forEach(projectile => {
+        projectile.update()
+    })
+}
+
+
+/* A chaque fois qu'on appelle une fonction en réponse à un clic en utilisant
+ * un addEventListener, le premier argument de cette fonction va être un objet "Event"
+ * qui contient les détails de l'événements, dont les coordonnées de la souris lors du clic
+*/
+addEventListener('click', (Event) => {
+    //console.log(Event)
+
+    const angle = Math.atan2(
+        Event.clientY - canvas.height / 2,
+        Event.clientX - canvas.width / 2
+    )
+
+    const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle),
+    }
+    console.log(angle)
+    projectiles.push(new Projectile(
+        canvas.width / 2, // Position x initiale au milieu du canvas
+        canvas.height / 2, // Position y initiale au milieu du canvas
+        5, // Rayon du projectile
+        "red", // Couleur du projectile
+        velocity, // Vitesse du projectile (vecteur)))
+    ))
+})
+
+// Appeler la fonction animate pour commencer l'animation
+animate()
