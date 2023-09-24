@@ -142,8 +142,18 @@ function animate() {
     context.clearRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
     player.draw(); // Dessiner le joueur
     // Mettre à jour la position de chaque projectile
-    projectiles.forEach(projectile => {
+    projectiles.forEach((projectile, projectileIndex) => {
         projectile.update()
+
+        // Suppression des projectiles quand ils arrivent sur les bords de l'écran
+        if (projectile.x + projectile.radius < 0 || projectile.x - canvas.width > 0 ||
+            projectile.y + projectile.radius < 0 || projectile.y - canvas.height > 0) {
+            setTimeout(() => {
+                projectiles.splice(projectileIndex, 1)
+            }, 0)
+
+        }
+
     })
 
     // Mettre à jour la position de chaque ennemi et gérer les collisions avec les projectiles
@@ -154,7 +164,7 @@ function animate() {
         // Vérifier s'il y a une collision entre le projectile et l'ennemi
         if (dist - enemy.radius - player.radius < 1) {
             // Arrêter l'animation si une collision avec le joueur est détectée
-            cancelAnimationFrame(animationId)
+            // cancelAnimationFrame(animationId)
 
         }
         projectiles.forEach((projectile, projectileIndex) => {
@@ -166,7 +176,7 @@ function animate() {
                 // Supprimer l'ennemi et le projectile en utilisant setTimeout pour éviter des problèmes de suppression pendant la boucle
                 setTimeout(() => {
                     // On supprime l'ennemie et le projectile du tableau en utilisant l'index
-                    enemies.splice(enemyIndex, 1) 
+                    enemies.splice(enemyIndex, 1)
                     projectiles.splice(projectileIndex, 1)
                 }, 0)
 
@@ -185,6 +195,7 @@ function animate() {
 addEventListener('click', (Event) => {
     //console.log(Event)
 
+    console.log(projectiles)
     // Calculer l'angle entre le clic de la souris et le centre du canvas
     const angle = Math.atan2(
         Event.clientY - canvas.height / 2,
