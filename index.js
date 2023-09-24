@@ -94,7 +94,7 @@ class Enemy {
 // Calculer la position x et y du joueur au milieu du canvas puis on instancie le joueur
 const playerX = canvas.width / 2;
 const playerY = canvas.height / 2;
-const player = new Player(playerX, playerY, 30, 'blue');
+const player = new Player(playerX, playerY, 10, 'white');
 
 
 const projectiles = []
@@ -104,7 +104,7 @@ function spawnEnemies() {
     setInterval(() => {
         // Générer un rayon aléatoire pour l'ennemi entre 4 et 30
         const radius = Math.random() * (30 - 4) + 4
-        const color = "green"
+        const color = `hsl(${Math.random() * 360}, 50%, 50%)` // HSL = Hue Saturation Lightness (Teinte, Saturation, Luminosité)
         let x
         let y
 
@@ -139,7 +139,8 @@ let animationId
 function animate() {
     // Demander au navigateur d'exécuter cette fonction en boucle
     animationId = requestAnimationFrame(animate);
-    context.clearRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
+    context.fillStyle = 'rgba(0, 0, 0, 0.1)' // Couleur RGB + Opacité. Ajouter de l'opacité donne un effet de shading à l'application
+    context.fillRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
     player.draw(); // Dessiner le joueur
     // Mettre à jour la position de chaque projectile
     projectiles.forEach((projectile, projectileIndex) => {
@@ -164,7 +165,7 @@ function animate() {
         // Vérifier s'il y a une collision entre le projectile et l'ennemi
         if (dist - enemy.radius - player.radius < 1) {
             // Arrêter l'animation si une collision avec le joueur est détectée
-            // cancelAnimationFrame(animationId)
+            cancelAnimationFrame(animationId)
 
         }
         projectiles.forEach((projectile, projectileIndex) => {
@@ -204,15 +205,15 @@ addEventListener('click', (Event) => {
 
     // Calculer la vitesse du projectile en fonction de l'angle
     const velocity = {
-        x: Math.cos(angle),
-        y: Math.sin(angle),
+        x: Math.cos(angle) * 2,
+        y: Math.sin(angle) * 2,
     }
 
     projectiles.push(new Projectile(
         canvas.width / 2, // Position x initiale au milieu du canvas
         canvas.height / 2, // Position y initiale au milieu du canvas
-        5, // Rayon du projectile
-        "red", // Couleur du projectile
+        10, // Rayon du projectile
+        "white", // Couleur du projectile
         velocity, // Vitesse du projectile
     ))
 })
