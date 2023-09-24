@@ -91,33 +91,45 @@ class Enemy {
     }
 }
 
+const friction = 0.98
 class Particule {
-    // Constructeur pour initialiser un projectile
+    // Constructeur pour initialiser une particule
     constructor(x, y, radius, color, velocity) {
-        this.x = x; // Position x du projectile
-        this.y = y; // Position y du projectile
-        this.radius = radius; // Rayon du projectile
-        this.color = color; // Couleur du projectile
-        this.velocity = velocity; // Vitesse du projectile (un vecteur avec les composantes x et y)
+        this.x = x; // Position x de la particule
+        this.y = y; // Position y de la particule
+        this.radius = radius; // Rayon de la particule
+        this.color = color; // Couleur de la particule
+        this.velocity = velocity; // Vitesse de la particule (un vecteur avec les composantes x et y)
+        this.alpha = 1
     }
 
-    // Méthode pour dessiner le projectile
+    // Méthode pour dessiner la particule
     draw() {
+        // Sauvegarde l'état du contexte de dessin
+        context.save()
+        // Définit la transparence de la particule
+        context.globalAlpha = this.alpha
         // Début d'un nouveau chemin
         context.beginPath();
-        // Dessiner un cercle pour représenter le projectile
+        // Dessiner un cercle pour représenter la particule
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         // Remplir le cercle avec la couleur spécifiée
         context.fillStyle = this.color;
         context.fill();
+        // Restaure l'état précédent du contexte de dessin (annule l'effet de globalAlpha)
+        context.restore()
     }
 
-    // Méthode pour mettre à jour la position du projectile
+    // Méthode pour mettre à jour la position de la particule
     update() {
         this.draw()
-        // Mettre à jour la position du projectile en fonction de sa vitesse
+        // Mettre à jour la position de la particule en fonction de sa vitesse
+        this.velocity.x *= friction
+        this.velocity.y *= friction
         this.x += this.velocity.x;
         this.y += this.velocity.y;
+        // On dimminue l'opacité de la particule
+        this.alpha -= 0.01
 
     }
 }
@@ -129,6 +141,7 @@ const player = new Player(playerX, playerY, 10, 'white');
 
 
 const projectiles = []
+const particules = []
 const enemies = []
 
 function spawnEnemies() {
@@ -173,8 +186,17 @@ function animate() {
     context.fillStyle = 'rgba(0, 0, 0, 0.1)' // Couleur RGB + Opacité. Ajouter de l'opacité donne un effet de shading à l'application
     context.fillRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
     player.draw(); // Dessiner le joueur
+    particules.forEach((particule, particuleIndex) => {
+        if (particule.alpha <= 0) {
+            particules.splice(particuleIndex, 1)
+        } else {
+            particule.update()
+        }
+
+    })
     // Mettre à jour la position de chaque projectile
     projectiles.forEach((projectile, projectileIndex) => {
+
         projectile.update()
 
         // Suppression des projectiles quand ils arrivent sur les bords de l'écran
@@ -207,7 +229,19 @@ function animate() {
             if (dist - enemy.radius - projectile.radius < 1) {
                 // Supprimer l'ennemi et le projectile en utilisant setTimeout pour éviter des problèmes de suppression pendant la boucle
 
+                // Création des particules
+                for (let i = 0; i < enemy.radius; i++) {
+                    particules.push(new Particule(
+                        projectile.x, projectile.y,
+                        Math.random() * 2,
+                        enemy.color,
+                        {
+                            x: (Math.random() - 0.5) * (Math.random() * 6),
+                            y: (Math.random() - 0.5) * (Math.random() * 6)
+                        }))
+                }
                 if (enemy.radius - 10 > 5) {
+                    // Utilisation de la librairie GSAP pour animer la réduction de la taille de l'ennemi
                     gsap.to(enemy, {
                         radius: enemy.radius - 10
                     })
