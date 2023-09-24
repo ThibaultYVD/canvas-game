@@ -91,7 +91,7 @@ class Enemy {
     }
 }
 
-const friction = 0.98
+const friction = 0.98 // Constante pour gérer la friction
 class Particule {
     // Constructeur pour initialiser une particule
     constructor(x, y, radius, color, velocity) {
@@ -100,7 +100,7 @@ class Particule {
         this.radius = radius; // Rayon de la particule
         this.color = color; // Couleur de la particule
         this.velocity = velocity; // Vitesse de la particule (un vecteur avec les composantes x et y)
-        this.alpha = 1
+        this.alpha = 1 // Opacité
     }
 
     // Méthode pour dessiner la particule
@@ -123,7 +123,7 @@ class Particule {
     // Méthode pour mettre à jour la position de la particule
     update() {
         this.draw()
-        // Mettre à jour la position de la particule en fonction de sa vitesse
+        // Mettre à jour la position de la particule en fonction de sa vitesse et ralentissent de plus en plus
         this.velocity.x *= friction
         this.velocity.y *= friction
         this.x += this.velocity.x;
@@ -232,11 +232,12 @@ function animate() {
                 // Création des particules
                 for (let i = 0; i < enemy.radius; i++) {
                     particules.push(new Particule(
-                        projectile.x, projectile.y,
-                        Math.random() * 2,
-                        enemy.color,
+                        projectile.x, projectile.y, // Coordonnées x et y du projectile comme base des coordonnées des particules
+                        Math.random() * 2, // Radius des particules aléatoires
+                        enemy.color, // Couleurs des particules = couleur de l'ennemie
                         {
-                            x: (Math.random() - 0.5) * (Math.random() * 6),
+                            // Vélocité des particules très aléatoire, qui vont simuler une explosion
+                            x: (Math.random() - 0.5) * (Math.random() * 6), 
                             y: (Math.random() - 0.5) * (Math.random() * 6)
                         }))
                 }
