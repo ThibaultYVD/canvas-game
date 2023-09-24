@@ -91,6 +91,37 @@ class Enemy {
     }
 }
 
+class Particule {
+    // Constructeur pour initialiser un projectile
+    constructor(x, y, radius, color, velocity) {
+        this.x = x; // Position x du projectile
+        this.y = y; // Position y du projectile
+        this.radius = radius; // Rayon du projectile
+        this.color = color; // Couleur du projectile
+        this.velocity = velocity; // Vitesse du projectile (un vecteur avec les composantes x et y)
+    }
+
+    // Méthode pour dessiner le projectile
+    draw() {
+        // Début d'un nouveau chemin
+        context.beginPath();
+        // Dessiner un cercle pour représenter le projectile
+        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        // Remplir le cercle avec la couleur spécifiée
+        context.fillStyle = this.color;
+        context.fill();
+    }
+
+    // Méthode pour mettre à jour la position du projectile
+    update() {
+        this.draw()
+        // Mettre à jour la position du projectile en fonction de sa vitesse
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+
+    }
+}
+
 // Calculer la position x et y du joueur au milieu du canvas puis on instancie le joueur
 const playerX = canvas.width / 2;
 const playerY = canvas.height / 2;
@@ -103,7 +134,7 @@ const enemies = []
 function spawnEnemies() {
     setInterval(() => {
         // Générer un rayon aléatoire pour l'ennemi entre 4 et 30
-        const radius = Math.random() * (30 - 4) + 4
+        const radius = Math.random() * (30 - 4) + 8
         const color = `hsl(${Math.random() * 360}, 50%, 50%)` // HSL = Hue Saturation Lightness (Teinte, Saturation, Luminosité)
         let x
         let y
@@ -130,7 +161,7 @@ function spawnEnemies() {
             y: Math.sin(angle),
         }
         enemies.push(new Enemy(x, y, radius, color, velocity))
-    }, 1000)
+    }, 2000)
 }
 
 let animationId
@@ -162,7 +193,7 @@ function animate() {
         enemy.update()
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
 
-        // Vérifier s'il y a une collision entre le projectile et l'ennemi
+        // Vérifier s'il y a une collision entre le projectile et le joueur
         if (dist - enemy.radius - player.radius < 1) {
             // Arrêter l'animation si une collision avec le joueur est détectée
             cancelAnimationFrame(animationId)
@@ -172,14 +203,28 @@ function animate() {
             // Calculer la distance entre le projectile et l'ennemi
             const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
 
-            // Vérifier s'il y a une collision entre le projectile et l'ennemi
+            // Quand un projectile touche un ennemie
             if (dist - enemy.radius - projectile.radius < 1) {
                 // Supprimer l'ennemi et le projectile en utilisant setTimeout pour éviter des problèmes de suppression pendant la boucle
-                setTimeout(() => {
-                    // On supprime l'ennemie et le projectile du tableau en utilisant l'index
-                    enemies.splice(enemyIndex, 1)
-                    projectiles.splice(projectileIndex, 1)
-                }, 0)
+
+                if (enemy.radius - 10 > 5) {
+                    gsap.to(enemy, {
+                        radius: enemy.radius - 10
+                    })
+
+                    setTimeout(() => {
+                        // On dimminue la taille de l'ennemie et on supprime projectile du tableau en utilisant l'index
+                        projectiles.splice(projectileIndex, 1)
+                    }, 0)
+                } else {
+                    setTimeout(() => {
+                        // On supprime l'ennemie et le projectile du tableau en utilisant l'index
+                        enemies.splice(enemyIndex, 1)
+                        projectiles.splice(projectileIndex, 1)
+                    }, 0)
+                }
+
+
 
             }
         })
@@ -196,7 +241,6 @@ function animate() {
 addEventListener('click', (Event) => {
     //console.log(Event)
 
-    console.log(projectiles)
     // Calculer l'angle entre le clic de la souris et le centre du canvas
     const angle = Math.atan2(
         Event.clientY - canvas.height / 2,
@@ -205,14 +249,14 @@ addEventListener('click', (Event) => {
 
     // Calculer la vitesse du projectile en fonction de l'angle
     const velocity = {
-        x: Math.cos(angle) * 2,
-        y: Math.sin(angle) * 2,
+        x: Math.cos(angle) * 4,
+        y: Math.sin(angle) * 4,
     }
 
     projectiles.push(new Projectile(
         canvas.width / 2, // Position x initiale au milieu du canvas
         canvas.height / 2, // Position y initiale au milieu du canvas
-        10, // Rayon du projectile
+        5, // Rayon du projectile
         "white", // Couleur du projectile
         velocity, // Vitesse du projectile
     ))
