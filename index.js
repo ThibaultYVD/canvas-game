@@ -1,4 +1,5 @@
 const canvas = document.querySelector('canvas')
+const uiScore = document.querySelector('#score')
 
 // Obtenir un contexte de dessin 2D à partir de l'élément HTML canvas
 const context = canvas.getContext('2d')
@@ -174,23 +175,26 @@ function spawnEnemies() {
             y: Math.sin(angle),
         }
         enemies.push(new Enemy(x, y, radius, color, velocity))
-    }, 2000)
+    }, 1500)
 }
 
 let animationId
+let score = 0
 
 // Fonction pour animer l'application
 function animate() {
-    // Demander au navigateur d'exécuter cette fonction en boucle
+    // Demander au navigateur d'exécuter cette fonction en boucle, elle s'exécute à chaque frame
     animationId = requestAnimationFrame(animate);
     context.fillStyle = 'rgba(0, 0, 0, 0.1)' // Couleur RGB + Opacité. Ajouter de l'opacité donne un effet de shading à l'application
     context.fillRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
     player.draw(); // Dessiner le joueur
+
     particules.forEach((particule, particuleIndex) => {
         if (particule.alpha <= 0) {
+            // Suppression des particules
             particules.splice(particuleIndex, 1)
         } else {
-            particule.update()
+            particule.update() // Mise à jour des particules
         }
 
     })
@@ -227,24 +231,34 @@ function animate() {
 
             // Quand un projectile touche un ennemie
             if (dist - enemy.radius - projectile.radius < 1) {
-                // Supprimer l'ennemi et le projectile en utilisant setTimeout pour éviter des problèmes de suppression pendant la boucle
 
+
+
+
+
+                console.log(score.innerHTML)
                 // Création des particules
-                for (let i = 0; i < enemy.radius; i++) {
+                for (let i = 0; i < enemy.radius * 1.5; i++) {
                     particules.push(new Particule(
                         projectile.x, projectile.y, // Coordonnées x et y du projectile comme base des coordonnées des particules
                         Math.random() * 2, // Radius des particules aléatoires
                         enemy.color, // Couleurs des particules = couleur de l'ennemie
                         {
                             // Vélocité des particules très aléatoire, qui vont simuler une explosion
-                            x: (Math.random() - 0.5) * (Math.random() * 6), 
+                            x: (Math.random() - 0.5) * (Math.random() * 6),
                             y: (Math.random() - 0.5) * (Math.random() * 6)
                         }))
                 }
-                if (enemy.radius - 10 > 5) {
+                if (enemy.radius - 10 > 7) {
+                    // Augmenter le score de 100 quand on réduit la taille de l'ennemie
+                    score += 100
+                    uiScore.innerHTML = score
+
+
+
                     // Utilisation de la librairie GSAP pour animer la réduction de la taille de l'ennemi
                     gsap.to(enemy, {
-                        radius: enemy.radius - 10
+                        radius: enemy.radius - 12
                     })
 
                     setTimeout(() => {
@@ -253,6 +267,10 @@ function animate() {
                     }, 0)
                 } else {
                     setTimeout(() => {
+                        // Augmenter le score de 250 quand on élimine l'ennemie
+                        score += 250
+                        uiScore.innerHTML = score
+
                         // On supprime l'ennemie et le projectile du tableau en utilisant l'index
                         enemies.splice(enemyIndex, 1)
                         projectiles.splice(projectileIndex, 1)
