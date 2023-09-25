@@ -1,5 +1,8 @@
 const canvas = document.querySelector('canvas')
 const uiScore = document.querySelector('#score')
+const startGameBtn = document.querySelector('#StartGameBtn')
+const menuModel = document.querySelector('#MenuModal')
+const menuScore = document.querySelector('#MenuScore')
 
 // Obtenir un contexte de dessin 2D à partir de l'élément HTML canvas
 const context = canvas.getContext('2d')
@@ -138,12 +141,25 @@ class Particule {
 // Calculer la position x et y du joueur au milieu du canvas puis on instancie le joueur
 const playerX = canvas.width / 2;
 const playerY = canvas.height / 2;
-const player = new Player(playerX, playerY, 10, 'white');
 
 
-const projectiles = []
-const particules = []
-const enemies = []
+let player = new Player(playerX, playerY, 10, 'white');
+
+let projectiles = []
+let particules = []
+let enemies = []
+
+function init() {
+    player = new Player(playerX, playerY, 10, 'white');
+
+    projectiles = []
+    particules = []
+    enemies = []
+    score = 0
+    uiScore.innerHTML = score
+    menuScore.innerHTML = score
+}
+
 
 function spawnEnemies() {
     setInterval(() => {
@@ -171,8 +187,8 @@ function spawnEnemies() {
 
         // Calculer la vitesse de l'ennemi en fonction de l'angle
         const velocity = {
-            x: Math.cos(angle),
-            y: Math.sin(angle),
+            x: Math.cos(angle) * 1.1,
+            y: Math.sin(angle) * 1.1,
         }
         enemies.push(new Enemy(x, y, radius, color, velocity))
     }, 1500)
@@ -223,6 +239,11 @@ function animate() {
         if (dist - enemy.radius - player.radius < 1) {
             // Arrêter l'animation si une collision avec le joueur est détectée
             cancelAnimationFrame(animationId)
+
+            // Réafficher le menu
+            menuModel.style.display = 'flex'
+
+            menuScore.innerHTML = score
 
         }
         projectiles.forEach((projectile, projectileIndex) => {
@@ -315,6 +336,10 @@ addEventListener('click', (Event) => {
     ))
 })
 
-// Appeler la fonction animate pour commencer l'animation
-animate()
-spawnEnemies()
+// Bouton de lancement du jeu
+startGameBtn.addEventListener("click", () => {
+    init()
+    animate() // Appeler la fonction animate pour commencer l'animation
+    spawnEnemies() // Appeler la fonction pour faire apparaître les ennemies
+    menuModel.style.display = 'none' // On fait disparaître le menu
+})
