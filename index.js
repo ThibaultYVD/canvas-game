@@ -4,6 +4,12 @@ const startGameBtn = document.querySelector('#StartGameBtn')
 const menuModel = document.querySelector('#MenuModal')
 const menuScore = document.querySelector('#MenuScore')
 
+
+let splashSfx = new Audio('splat sound effects.mp3')
+let blasterSfx = new Audio('star-wars-blaster-sfx.mp3')
+let deathSfx = new Audio('Mario deathGame over sound effect.mp3')
+blasterSfx.volume = 0.7
+
 // Obtenir un contexte de dessin 2D à partir de l'élément HTML canvas
 const context = canvas.getContext('2d')
 
@@ -191,7 +197,7 @@ function spawnEnemies() {
             y: Math.sin(angle) * 1.1,
         }
         enemies.push(new Enemy(x, y, radius, color, velocity))
-    }, 1500)
+    }, 1800)
 }
 
 let animationId
@@ -237,6 +243,10 @@ function animate() {
 
         // Vérifier s'il y a une collision entre le projectile et le joueur
         if (dist - enemy.radius - player.radius < 1) {
+
+            deathSfx.currentTime = 0
+            deathSfx.play()
+
             // Arrêter l'animation si une collision avec le joueur est détectée
             cancelAnimationFrame(animationId)
 
@@ -254,10 +264,9 @@ function animate() {
             if (dist - enemy.radius - projectile.radius < 1) {
 
 
+                splashSfx.currentTime = 0
+                splashSfx.play()
 
-
-
-                console.log(score.innerHTML)
                 // Création des particules
                 for (let i = 0; i < enemy.radius * 1.5; i++) {
                     particules.push(new Particule(
@@ -334,6 +343,11 @@ addEventListener('click', (Event) => {
         "white", // Couleur du projectile
         velocity, // Vitesse du projectile
     ))
+    if (menuModel.style.display == 'none') {
+        blasterSfx.currentTime = 0
+        blasterSfx.play()
+    }
+
 })
 
 // Bouton de lancement du jeu
