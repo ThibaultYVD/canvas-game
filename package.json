@@ -1,0 +1,15 @@
+{
+  "name": "canvas-shooter",
+  "version": "1.0.0",
+  "description": "Game realised with the **canvas** element of HTML5 which enables dynamic drawing with Javascript. You can make graphs, animations and intercative images on a web page.\r Here, I have developed a game where the player can shoot projectiles to destroy enemies.\r I used Tailwind for the user interface.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ThibaultYVD",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^26.2.2"
+  }
+}

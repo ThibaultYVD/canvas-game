@@ -4,18 +4,32 @@ const startGameBtn = document.querySelector('#StartGameBtn')
 const menuModel = document.querySelector('#MenuModal')
 const menuScore = document.querySelector('#MenuScore')
 
-
-let splashSfx = new Audio('splat sound effects.mp3')
-let blasterSfx = new Audio('star-wars-blaster-sfx.mp3')
-let deathSfx = new Audio('Mario deathGame over sound effect.mp3')
+// Création de variables avec les fichiers audio
+const blasterSfx = document.getElementById('blasterSfx');
+const splashSfx = document.getElementById('splashSfx');
+const deathSfx = document.getElementById('deathSfx');
 blasterSfx.volume = 0.7
 
 // Obtenir un contexte de dessin 2D à partir de l'élément HTML canvas
 const context = canvas.getContext('2d')
 
-// Définir la largeur du canvas sur la largeur et la hauteur de la fenêtre du navigateur
+window.onresize = function () {
+    console.log("resizing ...")
+    resizeCanvas()
+    console.log(player.x)
+    player.update()
+
+}
+//resizeCanvas()
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+// Définir la largeur du canvas sur la largeur et la hauteur de la fenêtre du navigateur
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    //console.log(player.x)
+    //console.log(player.y)
+}
 
 class Player {
     // Constructeur pour initialiser un joueur
@@ -36,6 +50,12 @@ class Player {
         // Remplir le cercle avec la couleur spécifiée
         context.fillStyle = this.color
         context.fill()
+    }
+
+    update() {
+        this.draw()
+        this.x = canvas.width / 2;
+        this.y = canvas.height / 2;
     }
 }
 
@@ -66,6 +86,7 @@ class Projectile {
         // Mettre à jour la position du projectile en fonction de sa vitesse
         this.x += this.velocity.x;
         this.y += this.velocity.y;
+
 
     }
 }
@@ -156,6 +177,8 @@ let particules = []
 let enemies = []
 
 function init() {
+    let playerX = canvas.width / 2;
+    let playerY = canvas.height / 2;
     player = new Player(playerX, playerY, 10, 'white');
 
     projectiles = []
@@ -193,11 +216,11 @@ function spawnEnemies() {
 
         // Calculer la vitesse de l'ennemi en fonction de l'angle
         const velocity = {
-            x: Math.cos(angle) * 1.1,
-            y: Math.sin(angle) * 1.1,
+            x: Math.cos(angle),
+            y: Math.sin(angle),
         }
         enemies.push(new Enemy(x, y, radius, color, velocity))
-    }, 1800)
+    }, 2000)
 }
 
 let animationId
@@ -210,7 +233,6 @@ function animate() {
     context.fillStyle = 'rgba(0, 0, 0, 0.1)' // Couleur RGB + Opacité. Ajouter de l'opacité donne un effet de shading à l'application
     context.fillRect(0, 0, canvas.width, canvas.height) // Effacer le contenu du canvas pour chaque frame
     player.draw(); // Dessiner le joueur
-
     particules.forEach((particule, particuleIndex) => {
         if (particule.alpha <= 0) {
             // Suppression des particules

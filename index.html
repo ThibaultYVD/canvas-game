@@ -4,15 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>canvas game</title>
+    <title>canvas shooter</title>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
+    <!-- Importation des fichiers audio -->
+    <audio id="blasterSfx">
+        <source src="./assets/sounds/star-wars-blaster-sfx.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="splashSfx">
+        <source src="./assets/sounds/splat sound effects.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="deathSfx">
+        <source src="./assets/sounds/Mario deathGame over sound effect.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Afficher le score en haut à gauche de l'écran -->
     <div class="fixed text-white text-sn ml-2 mt-2 select-none">
         <span>Score: </span>
         <span id="score">0</span>
     </div>
 
+    <!-- Menu -->
     <div class="fixed inset-0 flex items-center justify-center" id="MenuModal">
         <div class="bg-white max-w-md w-full p-6 text-center">
             <h1 class="text-4xl font-bold leading-none" id="MenuScore">0</h1>
@@ -32,14 +46,9 @@
 
 </html>
 <script src="https://cdn.tailwindcss.com"></script>
-<style>
-    body {
-        margin: 0;
-        background: black;
-    }
-</style>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
     integrity="sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="./index.js"></script>
+<script src="./js/index.js"></script>
