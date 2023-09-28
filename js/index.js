@@ -13,23 +13,31 @@ blasterSfx.volume = 0.7
 // Obtenir un contexte de dessin 2D à partir de l'élément HTML canvas
 const context = canvas.getContext('2d')
 
+const friction = 0.98 // Constante pour gérer la friction
+
+// Calculer la position x et y du joueur au milieu du canvas
+const playerX = canvas.width / 2;
+const playerY = canvas.height / 2;
+let player
+let animationId
+let score = 0
+
 window.onresize = function () {
-    console.log("resizing ...")
+    // Actualisation de la taille du canvas
     resizeCanvas()
-    console.log(player.x)
+
+    // Actualisation du joueur
     player.update()
 
 }
-//resizeCanvas()
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-// Définir la largeur du canvas sur la largeur et la hauteur de la fenêtre du navigateur
+
 function resizeCanvas() {
+    // Définir la largeur du canvas sur la largeur et la hauteur de la fenêtre du navigateur
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    //console.log(player.x)
-    //console.log(player.y)
 }
+
+resizeCanvas()
 
 class Player {
     // Constructeur pour initialiser un joueur
@@ -52,6 +60,7 @@ class Player {
         context.fill()
     }
 
+    // Actualise le joueur, notament sa position
     update() {
         this.draw()
         this.x = canvas.width / 2;
@@ -86,8 +95,6 @@ class Projectile {
         // Mettre à jour la position du projectile en fonction de sa vitesse
         this.x += this.velocity.x;
         this.y += this.velocity.y;
-
-
     }
 }
 
@@ -122,7 +129,8 @@ class Enemy {
     }
 }
 
-const friction = 0.98 // Constante pour gérer la friction
+
+
 class Particule {
     // Constructeur pour initialiser une particule
     constructor(x, y, radius, color, velocity) {
@@ -165,22 +173,15 @@ class Particule {
     }
 }
 
-// Calculer la position x et y du joueur au milieu du canvas puis on instancie le joueur
-const playerX = canvas.width / 2;
-const playerY = canvas.height / 2;
 
-
-let player = new Player(playerX, playerY, 10, 'white');
-
-let projectiles = []
-let particules = []
-let enemies = []
 
 function init() {
+    // Positionnement du joueur au milieu du canvas
     let playerX = canvas.width / 2;
     let playerY = canvas.height / 2;
     player = new Player(playerX, playerY, 10, 'white');
 
+    // Supprime tout les projectiles, particules et ennemies et actualise le score à 0
     projectiles = []
     particules = []
     enemies = []
@@ -223,8 +224,7 @@ function spawnEnemies() {
     }, 2000)
 }
 
-let animationId
-let score = 0
+
 
 // Fonction pour animer l'application
 function animate() {
@@ -242,6 +242,7 @@ function animate() {
         }
 
     })
+
     // Mettre à jour la position de chaque projectile
     projectiles.forEach((projectile, projectileIndex) => {
 
@@ -253,9 +254,7 @@ function animate() {
             setTimeout(() => {
                 projectiles.splice(projectileIndex, 1)
             }, 0)
-
         }
-
     })
 
     // Mettre à jour la position de chaque ennemi et gérer les collisions avec les projectiles
@@ -263,9 +262,10 @@ function animate() {
         enemy.update()
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
 
-        // Vérifier s'il y a une collision entre le projectile et le joueur
+        // Quand il y a une collision entre le projectile et le joueur
         if (dist - enemy.radius - player.radius < 1) {
 
+            // On joue un son
             deathSfx.currentTime = 0
             deathSfx.play()
 
@@ -275,6 +275,7 @@ function animate() {
             // Réafficher le menu
             menuModel.style.display = 'flex'
 
+            // Actualise le score dans l'UI
             menuScore.innerHTML = score
 
         }
@@ -285,7 +286,7 @@ function animate() {
             // Quand un projectile touche un ennemie
             if (dist - enemy.radius - projectile.radius < 1) {
 
-
+                // On joue un son
                 splashSfx.currentTime = 0
                 splashSfx.play()
 
@@ -305,8 +306,6 @@ function animate() {
                     // Augmenter le score de 100 quand on réduit la taille de l'ennemie
                     score += 100
                     uiScore.innerHTML = score
-
-
 
                     // Utilisation de la librairie GSAP pour animer la réduction de la taille de l'ennemi
                     gsap.to(enemy, {
@@ -328,9 +327,6 @@ function animate() {
                         projectiles.splice(projectileIndex, 1)
                     }, 0)
                 }
-
-
-
             }
         })
     })
@@ -365,6 +361,8 @@ addEventListener('click', (Event) => {
         "white", // Couleur du projectile
         velocity, // Vitesse du projectile
     ))
+
+    // Pour pouvoir spammer le son de tire en jeu
     if (menuModel.style.display == 'none') {
         blasterSfx.currentTime = 0
         blasterSfx.play()
